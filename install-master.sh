@@ -119,6 +119,7 @@ systemctl enable kubelet
 systemctl start kubelet
 
 # 初始化kubeadm，使用阿里镜像仓库地址，环境变量指定本机IP，版本参数保持和kubectl version查的一致
+#service-node-port-range
 kubeadm init \
 --apiserver-advertise-address=$ETH0IP \
 --image-repository registry.aliyuncs.com/google_containers \
@@ -187,3 +188,10 @@ istioctl version
 kubectl apply -f ~/k8s-install/v1.23.3/ingress-nginx/deploy.yaml
 kubectl get service -n ingress-nginx
 kubectl get pods --namespace=ingress-nginx
+
+# ------------------------------------------
+# 9）安装k9s
+# ------------------------------------------
+cd ~/k8s-install/v1.23.3/k9s
+tar xzf k9s_Linux_x86_64.tar.gz
+mv k9s /usr/local/bin
