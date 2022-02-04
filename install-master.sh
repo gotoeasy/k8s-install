@@ -164,6 +164,7 @@ helm version
 # 修改镜像源
 helm repo remove stable
 helm repo add stable https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts
+helm repo add aliyuncs https://apphub.aliyuncs.com
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm repo list
@@ -173,8 +174,8 @@ helm search repo mysql
 # 7）安装Istio
 # ------------------------------------------
 cd ~/k8s-install/v1.23.3/istio
-tar xzf istio-1.11.6-linux-amd64.tar.gz
-mv istio-1.11.6 /opt/istio
+tar xzf istio-1.12.2-linux-amd64.tar.gz
+mv istio-1.12.2 /opt/istio
 echo 'export ISTIO_HOME=/opt/istio' >> /etc/profile
 echo 'export PATH=$PATH:$ISTIO_HOME/bin' >> /etc/profile
 source /etc/profile
