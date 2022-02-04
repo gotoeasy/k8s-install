@@ -153,11 +153,9 @@ echo '可用 kubectl get pods -n kube-system 查看状态，等待几分钟直�
 #kubectl taint node masterhostname node-role.kubernetes.io/master-
 #或 kubectl taint nodes --all node-role.kubernetes.io/master-
 
-
 # ------------------------------------------
 # 6）安装helm，如ingress-nginx中有按helm引用安装
 # ------------------------------------------
-# 下载安装
 cd ~/k8s-install/v1.23.3/helm
 tar -zxf helm-v3.8.0-linux-amd64.tar.gz
 mv  linux-amd64/helm  /usr/local/bin/helm
@@ -171,7 +169,20 @@ helm repo update
 helm repo list
 helm search repo mysql
 
-# ingress-nginx
+# ------------------------------------------
+# 7）安装Istio
+# ------------------------------------------
+cd ~/k8s-install/v1.23.3/istio
+tar xzf istio-1.11.6-linux-amd64.tar.gz
+mv istio-1.11.6 /opt/istio
+echo 'export ISTIO_HOME=/opt/istio' >> /etc/profile
+echo 'export PATH=$PATH:$ISTIO_HOME/bin' >> /etc/profile
+source /etc/profile
+istioctl version
+
+# ------------------------------------------
+# 8）安装ingress-nginx
+# ------------------------------------------
 kubectl apply -f ~/k8s-install/v1.23.3/ingress-nginx/deploy.yaml
 kubectl get service -n ingress-nginx
 kubectl get pods --namespace=ingress-nginx
