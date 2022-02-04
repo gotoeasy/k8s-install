@@ -76,17 +76,17 @@ systemctl start docker
 # 4）下载要用到各资源文件，免除繁琐的网络问题
 # ------------------------------------------
 # 下载
-docker pull gotoeasy/k8s-install
-docker run -d --name gotoeasy-k8s-install gotoeasy/k8s-install sh
+docker pull registry.cn-shanghai.aliyuncs.com/gotoeasy/k8s-install
+docker run -d --name gotoeasy-k8s-install registry.cn-shanghai.aliyuncs.com/gotoeasy/k8s-install sh
 docker cp gotoeasy-k8s-install:/k8s-install.tar.gz .
-docker stop gotoeasy-k8s-install && docker rm gotoeasy-k8s-install
+docker stop gotoeasy-k8s-install && docker rm gotoeasy-k8s-install && docker rmi registry.cn-shanghai.aliyuncs.com/gotoeasy/k8s-install
 tar -xzf k8s-install.tar.gz
 rm -f k8s-install.tar.gz
 cd ~/k8s-install/v1.23.3/ingress-nginx
 
 # 修改两个镜像包避免无法拉取
-sed -i 's@k8s.gcr.io/ingress-nginx/controller:v1\(.*\)@gotoeasy/ingress-nginx-controller:v1.1.1@' deploy.yaml
-sed -i 's@k8s.gcr.io/ingress-nginx/kube-webhook-certgen:v1\(.*\)$@gotoeasy/ingress-nginx-kube-webhook-certgen:v1.1.1@' deploy.yaml
+sed -i 's@k8s.gcr.io/ingress-nginx/controller:v1\(.*\)@registry.cn-shanghai.aliyuncs.com/gotoeasy/ingress-nginx-controller:v1.1.1@' deploy.yaml
+sed -i 's@k8s.gcr.io/ingress-nginx/kube-webhook-certgen:v1\(.*\)$@registry.cn-shanghai.aliyuncs.com/gotoeasy/ingress-nginx-kube-webhook-certgen:v1.1.1@' deploy.yaml
 cd
 
 # ------------------------------------------
@@ -136,7 +136,7 @@ kubeadm init \
 
 # 若是root用户就直接使用admin.conf
 echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /etc/profile
-source  /etc/profile
+source /etc/profile
 
 # 执行kubectl get nodes查看状态，此时为 NotReady，需要初始化虚拟网络
 kubectl apply -f ~/k8s-install/v1.23.3/canal/canal.yaml
@@ -151,11 +151,11 @@ echo '可用 kubectl get pods -n kube-system 查看状态，等待几分钟直�
 
 # 允许master发布pod，其中masterhostname是主机名
 #kubectl taint node masterhostname node-role.kubernetes.io/master-
-#参考 kubectl taint nodes --all node-role.kubernetes.io/master-
+#或 kubectl taint nodes --all node-role.kubernetes.io/master-
 
 
 # ------------------------------------------
-# 6）安装helm，你不用不代表别人不引用
+# 6）安装helm，如ingress-nginx中有按helm引用安装
 # ------------------------------------------
 # 下载安装
 cd ~/k8s-install/v1.23.3/helm
@@ -175,5 +175,3 @@ helm search repo mysql
 kubectl apply -f ~/k8s-install/v1.23.3/ingress-nginx/deploy.yaml
 kubectl get service -n ingress-nginx
 kubectl get pods --namespace=ingress-nginx
-
-
