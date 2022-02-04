@@ -13,5 +13,5 @@ RUN mkdir -p /k8s-install/v1.23.3/canal && \
     mkdir -p /k8s-install/v1.23.3/ingress-nginx && \
           cd /k8s-install/v1.23.3/ingress-nginx && wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml --no-check-certificate && \
     cd / && \
-    tar -czf k8s-install.tar.gz && rm -rf /k8s-install
+    tar -czf k8s-install.tar.gz k8s-install && rm -rf /k8s-install
 
