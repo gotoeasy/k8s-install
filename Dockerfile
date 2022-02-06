@@ -8,6 +8,8 @@ MAINTAINER gotoeasy <gotoeasy@163.com>
 
 RUN mkdir -p /k8s-install/v1.23.3/canal && \
           cd /k8s-install/v1.23.3/canal && wget https://projectcalico.docs.tigera.io/manifests/canal.yaml --no-check-certificate && \
+    mkdir -p /k8s-install/v1.23.3/calico && \
+          cd /k8s-install/v1.23.3/calico && wget https://docs.projectcalico.org/v3.11/manifests/calico.yaml --no-check-certificate && \
     mkdir -p /k8s-install/v1.23.3/helm && \
           cd /k8s-install/v1.23.3/helm && wget https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz --no-check-certificate && \
     mkdir -p /k8s-install/v1.23.3/ingress-nginx && \

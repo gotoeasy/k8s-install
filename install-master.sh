@@ -20,10 +20,7 @@ cd
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
 
 # 同步服务器时间
-# yum install chrony -y
-# systemctl enable chronyd
-# systemctl start chronyd
-# chronyc sources
+# ntpdate cn.pool.ntp.org
 # date
 
 # 永久关闭防火墙
@@ -38,9 +35,15 @@ swapoff -a
 sed -i.bak '/swap/s/^/#/' /etc/fstab
 
 # 内核参数修改
-cat > /etc/sysctl.d/k8s.conf << EOF
+# https://kubernetes.io/zh/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
 EOF
 sysctl --system
 
@@ -137,6 +140,11 @@ kubeadm init \
 
 # 若是root用户就直接使用admin.conf
 echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /etc/profile
+
+# 命令别名
+echo 'alias d=docker' >> /etc/profile
+echo 'alias k=kubectl' >> /etc/profile
+
 source /etc/profile
 
 # 执行kubectl get nodes查看状态，此时为 NotReady，需要初始化虚拟网络
@@ -195,3 +203,12 @@ kubectl get pods --namespace=ingress-nginx
 cd ~/k8s-install/v1.23.3/k9s
 tar xzf k9s_Linux_x86_64.tar.gz
 mv k9s /usr/local/bin
+cd
+
+#kubernetes-dashboard默认default名称空间权限，按下面步骤操作可有全部名称空间权限
+#kubernetes-dashboard 创建管理员token，可查看任何空间权限
+#kubectl create clusterrolebinding dashboard-cluster-admin --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:kubernetes-dashboard
+#查看kubernetes-dashboard名称空间下的secret
+#kubectl get secret -n kubernetes-dashboard
+#找到对应的带有token的 kubernetes-dashboard-token-xxxx, 然后查看其token
+#kubectl describe secret kubernetes-dashboard-token-xxxx -n kubernetes-dashboard
