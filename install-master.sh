@@ -71,6 +71,7 @@ cat > /etc/docker/daemon.json <<EOF
 EOF
 
 # 设定docker开机启动
+#systemctl daemon-reload
 systemctl enable docker
 systemctl start docker
 #docker info
@@ -90,7 +91,20 @@ cd ~/k8s-install/v1.23.3/ingress-nginx
 # 修改两个镜像包避免无法拉取
 sed -i 's@k8s.gcr.io/ingress-nginx/controller:v1\(.*\)@registry.cn-shanghai.aliyuncs.com/gotoeasy/ingress-nginx-controller:v1.1.1@' deploy.yaml
 sed -i 's@k8s.gcr.io/ingress-nginx/kube-webhook-certgen:v1\(.*\)$@registry.cn-shanghai.aliyuncs.com/gotoeasy/ingress-nginx-kube-webhook-certgen:v1.1.1@' deploy.yaml
+
+# 把Deployment改成DaemonSet以便在每个node上都开启一个实例
+sed -i 's@Deployment$@DaemonSet@' deploy.yaml
+# 开启hostNetwork 启用80、443端口 hostNetwork: true
+sed -i '/dnsPolicy: ClusterFirst/i\      hostNetwork: true' deploy.yaml
+# 绑定宿主机ip地址 watch-ingress-without-class=true
+sed -i '/validating-webhook-key/a\            - --watch-ingress-without-class=true' deploy.yaml
 cd
+
+# policy/v1beta1将弃用，改为policy/v1
+cd ~/k8s-install/v1.23.3/canal
+sed -i 's@policy/v1beta1@policy/v1@' canal.yaml
+cd
+
 
 # ------------------------------------------
 # 5）安装kubernetes
@@ -177,18 +191,24 @@ helm repo add aliyuncs https://apphub.aliyuncs.com
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm repo list
-helm search repo mysql
+#helm search repo mysql
 
 # ------------------------------------------
 # 7）安装Istio
 # ------------------------------------------
-cd ~/k8s-install/v1.23.3/istio
-tar xzf istio-1.12.2-linux-amd64.tar.gz
-mv istio-1.12.2 /opt/istio
-echo 'export ISTIO_HOME=/opt/istio' >> /etc/profile
-echo 'export PATH=$PATH:$ISTIO_HOME/bin' >> /etc/profile
-source /etc/profile
-istioctl version
+#cd ~/k8s-install/v1.23.3/istio
+#tar xzf istio-1.12.2-linux-amd64.tar.gz
+#mv istio-1.12.2 /opt/istio
+#echo 'export ISTIO_HOME=/opt/istio' >> /etc/profile
+#echo 'export PATH=$PATH:$ISTIO_HOME/bin' >> /etc/profile
+#source /etc/profile
+#istioctl version
+
+#安装 https://www.cnblogs.com/huanglingfa/p/13895297.html
+#istioctl manifest apply --set profile=demo
+#查询部署完成情况
+#kubectl get svc -n istio-system
+#kubectl get pods -n istio-system
 
 # ------------------------------------------
 # 8）安装ingress-nginx
