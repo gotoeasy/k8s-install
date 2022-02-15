@@ -18,6 +18,9 @@ export K8SVER=1.23.3
 cd
 # 时区
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
+echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
+source /etc/locale.conf
+date
 
 # 同步服务器时间
 # ntpdate cn.pool.ntp.org
@@ -63,8 +66,10 @@ yum -y install docker-ce-20.10.12-3.el7
 
 # 修改docker cgroup驱动，与k8s一致，设定docker镜像加速，docker配置不少按需修改
 mkdir -p /etc/docker
+mkdir -p /opt/docker/data-root
 cat > /etc/docker/daemon.json <<EOF
 {
+  "data-root": "/opt/docker/data-root",
   "exec-opts": ["native.cgroupdriver=systemd"],
   "registry-mirrors": ["https://8k7wmbfp.mirror.aliyuncs.com","https://docker.mirrors.ustc.edu.cn"]
 }
@@ -158,6 +163,8 @@ echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /etc/profile
 # 命令别名
 echo 'alias d=docker' >> /etc/profile
 echo 'alias k=kubectl' >> /etc/profile
+# 支持别名k命令tab健补齐
+echo 'complete -F __start_kubectl k' >> /etc/profile
 
 source /etc/profile
 
@@ -225,10 +232,15 @@ tar xzf k9s_Linux_x86_64.tar.gz
 mv k9s /usr/local/bin
 cd
 
+# ------------------------------------------
+# 10）安装kubernetes-dashboard
+# ------------------------------------------
+#kubectl apply -f ~/k8s-install/v1.23.3/kubernetes-dashboard/recommended.yaml
 #kubernetes-dashboard默认default名称空间权限，按下面步骤操作可有全部名称空间权限
 #kubernetes-dashboard 创建管理员token，可查看任何空间权限
 #kubectl create clusterrolebinding dashboard-cluster-admin --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:kubernetes-dashboard
 #查看kubernetes-dashboard名称空间下的secret
-#kubectl get secret -n kubernetes-dashboard
+#kubectl -n kubernetes-dashboard get secret
 #找到对应的带有token的 kubernetes-dashboard-token-xxxx, 然后查看其token
-#kubectl describe secret kubernetes-dashboard-token-xxxx -n kubernetes-dashboard
+#kubectl -n kubernetes-dashboard describe secret kubernetes-dashboard-token-
+#最后根据需要配置ingress或暴露service端口供外网访问

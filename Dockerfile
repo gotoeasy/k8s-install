@@ -21,5 +21,6 @@ RUN mkdir -p /k8s-install/v1.23.3/canal && \
     mkdir -p /k8s-install/v1.23.3/k9s && \
           cd /k8s-install/v1.23.3/k9s && wget https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz --no-check-certificate && \
     cd / && \
+       wget https://github.com/goharbor/harbor/releases/download/v2.4.1/harbor-offline-installer-v2.4.1.tgz --no-check-certificate && \
     tar -czf k8s-install.tar.gz k8s-install && rm -rf /k8s-install
 
