@@ -14,6 +14,8 @@ RUN mkdir -p /k8s-install/v1.23.3/canal && \
           cd /k8s-install/v1.23.3/helm && wget https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz --no-check-certificate && \
     mkdir -p /k8s-install/v1.23.3/ingress-nginx && \
           cd /k8s-install/v1.23.3/ingress-nginx && wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml --no-check-certificate && \
+    mkdir -p /k8s-install/v1.23.3/metrics-server && \
+          cd /k8s-install/v1.23.3/metrics-server && wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.1/components.yaml --no-check-certificate && \
     mkdir -p /k8s-install/v1.23.3/istio && \
           cd /k8s-install/v1.23.3/istio && wget https://github.com/istio/istio/releases/download/1.12.2/istio-1.12.2-linux-amd64.tar.gz --no-check-certificate && \
     mkdir -p /k8s-install/v1.23.3/kubernetes-dashboard && \
