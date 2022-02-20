@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================================================================
-# 本脚本使用root账号安装，适用于兼容CentOS7的初始镜像，如阿里云的CentOS 7.9、AnolisOS 7.9
+# 本脚本使用root账号安装，在AnolisOS 7.9基础上成功，理应兼容CentOS 7.x
 # ============================================================================================
 
 # ------------------------------------------
@@ -94,8 +94,8 @@ rm -f k8s-install.tar.gz
 cd ~/k8s-install/v1.23.3/ingress-nginx
 
 # 修改两个镜像包避免无法拉取
-sed -i 's@k8s.gcr.io/ingress-nginx/controller:v1\(.*\)@registry.cn-shanghai.aliyuncs.com/gotoeasy/ingress-nginx-controller:v1.1.1@' deploy.yaml
-sed -i 's@k8s.gcr.io/ingress-nginx/kube-webhook-certgen:v1\(.*\)$@registry.cn-shanghai.aliyuncs.com/gotoeasy/ingress-nginx-kube-webhook-certgen:v1.1.1@' deploy.yaml
+sed -i 's@k8s.gcr.io/ingress-nginx/controller:v1\(.*\)@registry.cn-shanghai.aliyuncs.com/gotoeasy/devops:ingress-nginx-controller-v1.1.1@' deploy.yaml
+sed -i 's@k8s.gcr.io/ingress-nginx/kube-webhook-certgen:v1\(.*\)$@registry.cn-shanghai.aliyuncs.com/gotoeasy/devops:kube-webhook-certgen-v1.1.1@' deploy.yaml
 
 # 把Deployment改成DaemonSet以便在每个node上都开启一个实例
 sed -i 's@Deployment$@DaemonSet@' deploy.yaml
@@ -108,6 +108,13 @@ cd
 # policy/v1beta1将弃用，改为policy/v1
 cd ~/k8s-install/v1.23.3/canal
 sed -i 's@policy/v1beta1@policy/v1@' canal.yaml
+cd
+
+# 修改metrics-server的镜像包避免无法拉取
+cd ~/k8s-install/v1.23.3/metrics-server
+sed -i 's@k8s.gcr.io/metrics-server/metrics-server:v\(.*\)@registry.cn-shanghai.aliyuncs.com/gotoeasy/devops:metrics-server-v0.6.1@' components.yaml
+# 参数含metric-resolution的后面加一行参数，取消证书验证
+sed -i '/metric-resolution/a\        - --kubelet-insecure-tls' components.yaml
 cd
 
 
@@ -244,3 +251,8 @@ cd
 #找到对应的带有token的 kubernetes-dashboard-token-xxxx, 然后查看其token
 #kubectl -n kubernetes-dashboard describe secret kubernetes-dashboard-token-
 #最后根据需要配置ingress或暴露service端口供外网访问
+
+# ------------------------------------------
+# 11）安装metrics-server(节点群建起来后再装吧)
+# ------------------------------------------
+#kubectl apply -f ~/k8s-install/v1.23.3/metrics-server/components.yaml
