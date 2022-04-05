@@ -29,7 +29,7 @@ date
 # 永久关闭防火墙
 systemctl stop firewalld && systemctl disable firewalld
 
-# 永久关闭selinux
+# 永久关闭selinux，查看状态 sestatus
 setenforce 0
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config;cat /etc/selinux/config
 
@@ -256,3 +256,14 @@ cd
 # 11）安装metrics-server(节点群建起来后再装吧)
 # ------------------------------------------
 #kubectl apply -f ~/k8s-install/v1.23.3/metrics-server/components.yaml
+
+# ------------------------------------------
+# 12）安装gitlab-runner（helm 0.38.1 基础上修改）
+# ------------------------------------------
+# gitlab管理资源文件 -> gitlab-runner -> 部署
+# 替换gitlab-runner.tar中的gitlab地址及令牌
+# 创建命名空间、创建minio访问秘钥、安装
+# kubectl create namespace gitlab-runner
+# kubectl create secret generic s3access --from-literal=accesskey="minio" --from-literal=secretkey="password.123" -n gitlab-runner
+# helm install --name-template cicd -f values.yaml . --namespace gitlab-runner
+
